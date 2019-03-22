@@ -14,7 +14,11 @@ jest和karma测试，大部分模块使用jest测试，karma测试浏览器依�
 
 app和scene的异步初始化。已经用rust实现基础math模块。wasm2.0预计支持SIMD。
 
-> 依赖抽象
+> 面向接口编程
 
 对webgl依赖抽象，轻松切换webgl版本，以及移植到opengl。
+还有physics插件api封装成接口，可以轻松替换。
 
+> Option
+
+解决调用前未初始化的报错，以及等待初始化后的值。
