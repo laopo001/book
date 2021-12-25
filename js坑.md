@@ -1,4 +1,4 @@
-```
+```typescript
 class Animal {
     constructor() {
         this.speak();
@@ -11,8 +11,8 @@ class Snake extends Animal {
     abc={ 
         a:123
     }
-    constructor(name) {
-        super(name);
+    constructor() {
+        super();
         this.speak();
     }
     speak() {
