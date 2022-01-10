@@ -87,3 +87,52 @@ e.stopPropagation(); // 停止冒泡
 * 人为设置了非规定内的其他首部字段，参考上面简单请求的安全字段集合，还要特别注意Content-Type的类型
 * XMLHttpRequestUpload 对象注册了任何事件监听器
 * 请求中使用了ReadableStream对象
+
+```javascript
+let a = 10
+let total = 0
+let result = {}
+function foo(a) {
+    for (var i = 0; i < 3; i++) {
+        result[i] = function () {
+            total = total + i * a
+            console.log(total)
+        }
+    }
+}
+foo(1)
+result[0]()  // 3
+result[1]()  // 6
+result[2]()  // 9
+
+```
+
+
+```javascript
+setTimeout(() => {
+    console.log('1');
+    Promise.resolve().then(() => {
+        console.log('2');
+    })
+}, 0);
+new Promise(function (resolve, reject) {
+    console.log('3');
+    setTimeout(function () {
+        console.log('4');
+        resolve('5')
+    }, 0)
+}).then((res) => {
+    console.log('6');
+    setTimeout(() => {
+        console.log(res);
+    }, 0)
+})
+/*
+3
+1
+2
+4
+6
+5
+*/
+```
