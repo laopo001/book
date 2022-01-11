@@ -43,14 +43,14 @@ var a = {
     },
   },
 };
-
+a.b.fn.call(a); // 20
+a.b.fn(); // null
 (a.b.fn = a.b.fn)(); //30
 (a.b.fn , a.b.fn)(); //30
 ```
 > xss
 ```
 csp
-
 ```
 
 ```
