@@ -183,3 +183,221 @@ type DeepImmutableObject<T> = { readonly [K in keyof T]: DeepImmutable<T[K]> };
 
 export type ReadonlyObject<T> = { readonly [K in keyof T]: T[K] };
 ```
+
+```
+const xhr = new XMLHttpRequest();
+const url = 'https://bar.other/resources/public-data/';
+
+xhr.open('GET', url);
+xhr.onreadystatechange = someHandler;
+xhr.send();
+```
+
+```
+https://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html
+```
+
+```
+常见的http code
+101 Switching Protocols
+200 OK
+204 No Content
+206 Partial Content
+301 Moved Permanently
+302 Found
+304 Not Modified
+400 Bad Request
+401 Unauthorized
+403 Forbidden
+404 Not found
+405 Method Not Allowed
+412 Precondition Failed
+414 URI Too Long
+416 Range Not Satisfiable
+500 Internal Server Error
+502 Bad Gateway
+504 Gateway Timeout
+```
+
+
+```typescript
+Function.prototype['bind2'] = function (that, ...args) {
+  let fn = this;
+
+  function res(...args2) {
+    let q = args.concat(args2);
+    return fn.apply(that, q);
+  }
+
+  return res;
+};
+
+function a() {
+  console.log(this, arguments);
+  return 1;
+}
+let b = a.bind2(1, 2, 5);
+console.log(b());
+let c = b.bind2(3, 4);
+console.log(c());
+let d = c.bind2(3, 4);
+console.log(d());
+```
+
+```typescript
+function quickSort(arr, start, end) {
+  // 终止条件
+  if (start >= end) {
+    return;
+  }
+
+  // 返回 pivotIndex
+  let index = partition(arr, start, end);
+
+  // 将相同的逻辑递归地用于左右子数组
+  quickSort(arr, start, index - 1);
+  quickSort(arr, index + 1, end);
+}
+function partition(arr, start, end) {
+  // 以最后一个元素为基准
+  const pivotValue = arr[end];
+  let pivotIndex = start;
+  for (let i = start; i < end; i++) {
+    if (arr[i] < pivotValue) {
+      // 交换元素
+      [arr[i], arr[pivotIndex]] = [arr[pivotIndex], arr[i]];
+      // 移动到下一个元素
+      pivotIndex++;
+    }
+  }
+
+  // 把基准值放在中间
+  [arr[pivotIndex], arr[end]] = [arr[end], arr[pivotIndex]];
+  return pivotIndex;
+}
+```
+
+
+```
+setTimeout(()=>console.log('setTimeout'), 0);
+Promise.resolve().then(()=>console.log('promise'));
+requestAnimationFrame(()=>console.log('animation'));
+requestIdleCallback(()=>console.log('idle'));
+```
+
+promise
+animation
+setTimeout
+idle
+
+promise
+setTimeout
+animation
+idle
+
+
+```
+var A = function() {};
+A.prototype.n = 1;
+var b = new A();
+A.prototype.m = 9
+A.prototype = {
+ n: 2,
+ m: 3
+}
+
+var c = new A();
+
+console.log(b.n); // 1
+console.log(b.m); // 9
+console.log(c.n); // 2
+console.log(c.m); // 3
+
+ 
+
+function Test() {}
+Object.prototype.printName = function() {
+ console.log('Object');
+}
+
+Function.prototype.printName = function() {
+ console.log('Function');
+}
+
+Test.printName(); // Function
+var obj = new Test();
+obj.printName(); // Object
+```
+
+
+```javascript
+console.log(x)
+let x = 2
+console.log(x)
+var x = 3
+
+(function(){
+    var x = y = 1;
+})();
+console.log(y);
+console.log(x);
+```
+
+```
+function Parent(){
+   this.a = 'Parent'
+}
+
+function Tom() {
+   this.a = 'Tom'
+}
+
+Parent.__proto__.print = function(){
+   console.log(this.a)
+}
+
+Parent.print()
+Tom.print()
+var child = new Parent()
+child.print()
+
+执行以上代码，将分别输出什么？（请勿使用浏览器开发者工具调试）
+
+ 
+A. 'undefined' 'Uncaught TypeError ...' 'Parent'
+B. 'Parent' 'Uncaught TypeError ...' 'Uncaught TypeError ...'
+C. 'Parent' 'Tom' 'Uncaught TypeError ...'
+D. 'undefined' 'undefined' 'Uncaught TypeError ...'  // ✔️对
+```
+
+```
+var a = 10
+var obj = {
+  a: 20,
+  say: () => {
+    console.log(this.a)
+  }
+}
+
+obj.say() // undefined
+var anotherobj={a:30}
+obj.say.apply(anotherobj) // undefined
+function i() {
+  console.log(this.a); // undefined
+}
+i();
+```
+
+
+```
+Function.prototype.myCall = function (context) {
+  let fn = this;
+  let args = [];
+  let that = Object(context);
+  that.fn = fn;
+  for (let i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  that.fn(...args);
+};
+```
