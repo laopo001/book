@@ -379,11 +379,11 @@ var obj = {
   }
 }
 
-obj.say() // undefined
+obj.say() // 10
 var anotherobj={a:30}
-obj.say.apply(anotherobj) // undefined
+obj.say.apply(anotherobj) // 10
 function i() {
-  console.log(this.a); // undefined
+  console.log(this.a); // 10 // 严格模式下会报错，严格模式下的this在函数体内不会默认指向window，而是指向undefined
 }
 i();
 ```
@@ -393,11 +393,225 @@ i();
 Function.prototype.myCall = function (context) {
   let fn = this;
   let args = [];
-  let that = Object(context);
+  let that = context == null ? globalThis : Object(context);
   that.fn = fn;
   for (let i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   that.fn(...args);
 };
+```
+
+```
+function objectFactory(clasFn) {
+    var obj = new Object()
+    obj.__proto__ = clasFn.prototype;
+    let args = [];
+      for (let i = 1; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    var ret = clasFn.apply(obj, args);
+    
+    // ret || obj 这里这么写考虑了构造函数显示返回 null 的情况
+    return typeof ret === 'object' ? ret || obj : obj;
+};
+```
+
+```用纯 CSS 创建一个三角形
+    width: 0;
+    height: 0;
+    border-color: transparent transparent transparent red;
+    border-width: 20px;
+    border-style: solid;
+```
+
+```
+function father() {
+  this.num = 935;
+  this.work = ['read', 'write', 'listen'];
+}
+function son() {}
+son.prototype = new father();
+let son1 = new son();
+let son2 = new son();
+son1.num = 117;
+son1.work.pop();
+console.log(son2.num);  // 935
+console.log(son2.work); // ['read', 'write']
+```
+
+```
+var i = 100;
+function foo() {
+    bbb: try {
+        console.log("position1");
+        return i++; 
+    } finally {
+        break bbb;
+    }
+    console.log("position2");
+    return i;
+}
+foo();
+// position1
+// position2
+// 101
+```
+
+```
+var a = 10;
+function a(){}
+console.log(typeof a) // number
+```
+
+globalThis
+```
+Function('return this')()  // 方法一
+
+var getGlobal = function () {  // 方法二
+  if (typeof self !== 'undefined') { return self; } 
+  if (typeof window !== 'undefined') { return window; } 
+  if (typeof global !== 'undefined') { return global; } 
+  throw new Error('unable to locate global object'); 
+}; 
+```
+
+```typescript
+var num = prompt('请输入分母:')
+try{
+  console.log('a');
+  value = 0 / num;
+  console.log('b');
+}
+catch(e){
+  console.log('c');
+}
+finally{
+  console.log('d');
+}
+// a b d
+```
+
+```typescript
+var f = function g() {
+    return 23;
+ };
+console.log(f.name) // g
+typeof g(); // TypeError
+
+let Rectangle = class Rectangle2 {
+  constructor(height, width) {
+    this.height = height;
+    this.width = width;
+  }
+};
+console.log(Rectangle.name); // Rectangle2
+typeof Rectangle2; // 'undefined'
+```
+
+```
+var a = 1;
+function test(){
+    console.log(a) // error
+    class a {}
+    console.log(a) // class
+}
+test();
+```
+
+```
+'foo' == new function(){ return String('foo'); }; // false
+'foo' == new function(){ return new String('foo'); }; // true
+[] == false // true
+![] == false // true
+```
+
+```
+"use strict";
+var uname = 'window';
+(function(){console.log(this.uname)}());  // 报错 严格模式下的this在函数体内不会默认指向window，而是指向undefined
+```
+
+```
+function test() {
+    var n = 4399;
+    function add(){
+        n++;
+        console.log(n);
+    }
+    return {n:n,add:add}
+}
+var result = test();
+var result2 = test();
+result.add();  // 4400
+resukt2.add();  // 4400
+console.log(result.n); // 4399
+result2.add(); // 4401
+```
+
+
+```
+class Phone{
+  constructor(price){
+    this.price = price;
+  }
+  get price(){
+    return 999;
+  }
+}
+var p = new Phone(888); // error 没有set访问器，执行set
+console.log(p.price); 
+
+class Phone{
+  constructor(price){
+    this.price = price;
+  }
+  get price(){
+    return 999;
+  }
+  set price(x){}
+}
+var p = new Phone(888); 
+console.log(p.price); // 999
+```
+
+```
+var foo = "10"+3-"1";console.log(foo);  // 102
+```
+
+```
+不支持冒泡：妈（mouseenter）妈(mouseleave)不(blur)放(focus)心你(load,unload,resize)
+```
+
+```
+document.readyState;  loading | interactive | complete;
+```
+```
+var carname="Volvo";var carname;console.log(carname)  //Volvo
+```
+
+
+```
+async function a() {
+    console.log('a');
+    let _b = await b();
+    console.log(2);
+    return 1
+}
+async function b() {
+    console.log('b');
+    return 2
+}
+a();
+
+ new Promise((resolve, reject) => {
+    console.log('Promise')
+    resolve(1)
+}).then(x=>{
+     console.log('Promise than')
+})
+
+console.log(1);
+
+// a b Promise 1 2 (Promise than)
 ```
