@@ -586,6 +586,7 @@ var foo = "10"+3-"1";console.log(foo);  // 102
 ```
 document.readyState;  loading | interactive | complete;
 ```
+
 ```
 var carname="Volvo";var carname;console.log(carname)  //Volvo
 ```
@@ -614,4 +615,109 @@ a();
 console.log(1);
 
 // a b Promise 1 2 (Promise than)
+```
+
+```
+setTimeout(function () {
+   console.log(1)
+    Promise.resolve(0).then(()=>{console.log(2)}) 
+}, 0);
+setTimeout(function () {
+   console.log(3)
+}, 0);
+// 1 2 3 promise直接在当前微任务队列插入。
+```
+
+
+```
+function* genFn(x) {
+  console.log(x);
+  let y = 2 * (yield x + 1);
+  console.log(y);
+  let z = yield y + 3;
+  console.log(z);
+  return x + y + z;
+}
+
+let gn = genFn(5);
+gn.next(); // 5
+gn.next(12); // 24
+let res = gn.next(13); // 13
+console.log(res.value); // 42
+```
+
+```
+document.body.addEventListener('click', () => {
+  console.log('task1');
+  Promise.resolve().then(() => {
+    console.log('micro_Task1');
+  });
+  setTimeout(() => {
+    console.log('macro_Task1');
+  });
+});
+
+document.body.addEventListener('click', () => {
+  console.log('task2');
+  Promise.resolve().then(() => {
+    console.log('micro_Task2');
+  });
+  setTimeout(() => {
+    console.log('macro_Task2');
+  });
+});
+// 点击 console的顺序 task1 micro_Task1 task2 mincro_Task2 macro_Task1 macro_Task2
+// 使用js触发事件 console的顺序 task1 task2 micro_Task1 mincro_Task2 macro_Task1 macro_Task2
+// dom事件冒泡是在微任务之后，如果是手动触发是同步
+document.body.addEventListener('click', () => {
+  console.log('task1');
+  Promise.resolve().then(() => {
+    console.log('mincro Task1');
+  });
+  function run() {
+    console.log('run');
+    Promise.resolve().then(run); // 会卡住冒泡
+  }
+  run();
+});
+
+document.body.addEventListener('click', () => {
+  console.log('task2');
+  Promise.resolve().then(() => {
+    console.log('mincro Task2');
+  });
+});
+```
+
+```
+Number.isNaN = Number.isNaN || function(value) {
+    return typeof value === "number" && isNaN(value);
+}
+```
+
+
+```
+var b = 3;
+(function(){
+    b = 5;
+    var b = 2;
+})();
+console.log(b);
+```
+
+```
+function A(x){
+  this.x = x;
+}
+A.prototype.x = 1;
+ 
+function B(x){
+  this.x = x;
+}
+B.prototype = new A();
+var a = new A(2), b = new B(3);
+delete b.x;
+console.log(a.x);
+console.log(b.x);
+// 2 undefined
 ```
