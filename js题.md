@@ -187,7 +187,11 @@ export type ReadonlyObject<T> = { readonly [K in keyof T]: T[K] };
 ```
 const xhr = new XMLHttpRequest();
 const url = 'https://bar.other/resources/public-data/';
-
+function someHandler(xhr){
+    if(xhr.readyState === 4 && xhr.status === 200){
+        alert(xhr.responseText);
+    }
+}
 xhr.open('GET', url);
 xhr.onreadystatechange = someHandler;
 xhr.send();
@@ -195,6 +199,7 @@ xhr.send();
 
 ```
 https://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html
+https://www.ruanyifeng.com/blog/2019/09/react-hooks.html
 ```
 
 ```
@@ -219,6 +224,23 @@ https://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html
 504 Gateway Timeout
 ```
 
+```
+Function.prototype.myCall = function (context) {
+  let fn = this;
+  let args = [];
+  let that = context == null ? globalThis : Object(context);
+  that.fn = fn;
+  for (let i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  that.fn(...args);
+};
+
+fn.call(undefined);
+fn.call(null);
+fn.call(1);
+```
+
 
 ```typescript
 Function.prototype['bind2'] = function (that, ...args) {
@@ -226,7 +248,7 @@ Function.prototype['bind2'] = function (that, ...args) {
 
   function res(...args2) {
     let q = args.concat(args2);
-    return fn.apply(that, q);
+    return fn.myCall(that, ...q);
   }
 
   return res;
@@ -243,6 +265,7 @@ console.log(c());
 let d = c.bind2(3, 4);
 console.log(d());
 ```
+
 
 ```typescript
 function quickSort(arr, start, end) {
@@ -389,18 +412,6 @@ i();
 ```
 
 
-```
-Function.prototype.myCall = function (context) {
-  let fn = this;
-  let args = [];
-  let that = context == null ? globalThis : Object(context);
-  that.fn = fn;
-  for (let i = 1; i < arguments.length; i++) {
-    args.push(arguments[i]);
-  }
-  that.fn(...args);
-};
-```
 
 ```
 function objectFactory(clasFn) {
@@ -614,12 +625,12 @@ a();
 
 console.log(1);
 
-// a b Promise 1 2 (Promise than)
+// a b Promise 1   2 (Promise than)
 ```
 
 ```
 setTimeout(function () {
-   console.log(1)
+    console.log(1)
     Promise.resolve(0).then(()=>{console.log(2)}) 
 }, 0);
 setTimeout(function () {
@@ -647,17 +658,34 @@ console.log(res.value); // 42
 ```
 
 ```
+let i = 0;
+
+function a() {
+  i++;
+  if (i == 5) {
+    return;
+  }
+  console.log(1);
+  Promise.resolve(0).then(b);
+}
+
+function b() {
+  console.log(2);
+  Promise.resolve(0).then(a);
+}
+
 document.body.addEventListener('click', () => {
   console.log('task1');
   Promise.resolve().then(() => {
     console.log('micro_Task1');
   });
+  a();
   setTimeout(() => {
     console.log('macro_Task1');
   });
 });
 
-document.body.addEventListener('click', () => {
+document.addEventListener('click', () => {
   console.log('task2');
   Promise.resolve().then(() => {
     console.log('micro_Task2');
@@ -668,25 +696,7 @@ document.body.addEventListener('click', () => {
 });
 // 点击 console的顺序 task1 micro_Task1 task2 mincro_Task2 macro_Task1 macro_Task2
 // 使用js触发事件 console的顺序 task1 task2 micro_Task1 mincro_Task2 macro_Task1 macro_Task2
-// dom事件冒泡是在微任务之后，如果是手动触发是同步
-document.body.addEventListener('click', () => {
-  console.log('task1');
-  Promise.resolve().then(() => {
-    console.log('mincro Task1');
-  });
-  function run() {
-    console.log('run');
-    Promise.resolve().then(run); // 会卡住冒泡
-  }
-  run();
-});
-
-document.body.addEventListener('click', () => {
-  console.log('task2');
-  Promise.resolve().then(() => {
-    console.log('mincro Task2');
-  });
-});
+// dom事件冒泡是微任务，如果是手动触发冒泡是同步
 ```
 
 ```
@@ -702,7 +712,7 @@ var b = 3;
     b = 5;
     var b = 2;
 })();
-console.log(b);
+console.log(b); 3
 ```
 
 ```
@@ -720,4 +730,123 @@ delete b.x;
 console.log(a.x);
 console.log(b.x);
 // 2 undefined
+```
+
+
+```
+setImmediate() 对比 setTimeout()
+setImmediate() 和 setTimeout() 很类似，但是基于被调用的时机，他们也有不同表现。
+
+setImmediate() 设计为一旦在当前 轮询 阶段完成， 就执行脚本。
+setTimeout() 在最小阈值（ms 单位）过后运行脚本。
+
+
+process.nextTick() 对比 setImmediate()
+就用户而言，我们有两个类似的调用，但它们的名称令人费解。
+
+process.nextTick() 在同一个阶段立即执行。
+setImmediate() 在事件循环的接下来的迭代或 'tick' 上触发。
+
+您可能已经注意到 process.nextTick() 在图示中没有显示，即使它是异步 API 的一部分。这是因为 process.nextTick() 从技术上讲不是事件循环的一部分。相反，它都将在当前操作完成后处理 nextTickQueue，而不管事件循环的当前阶段如何。
+
+为什么要使用 process.nextTick()?
+有两个主要原因：
+
+1.允许用户处理错误，清理任何不需要的资源，或者在事件循环继续之前重试请求。
+2.有时有让回调在栈展开后，但在事件循环继续之前运行的必要。
+
+
+```
+
+
+```
+window.performance.getEntries() // 获取静态资源加载情况
+```
+
+```
+''.repalce(/^\s+|\s+$/g, '')
+```
+
+```
+Promise.resolve()
+.then(() => {
+  console.log('p1');
+})
+.then(() => {
+  console.log('p2');
+})
+
+Promise.resolve()
+.then(() => {
+  console.log('p11');
+})
+.then(() => {
+  console.log('p22');
+})
+p1
+p11
+p2
+p22
+```
+
+```
+Promise.resolve()
+.then(() => {
+  console.log('p1');
+})
+.then(() => {
+  console.log('p2');
+})
+process.nextTick(() => {
+  console.log('n1');
+  process.nextTick(() => {
+    console.log('n2');
+  })
+})
+n1
+n2
+p1
+p2
+```
+
+```
+var name="World!";
+(function(){
+       //注意这里，变量提升
+    if(typeof name === 'undefined'){
+       var  name = 'Jack'; //变量提升
+        console.log('Goodbye'+name);
+    }else{
+        console.log('hello'+name);
+    }
+})();
+```
+
+
+```
+var rAF = (function () {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    function (callback) {
+      window.setTimeout(callback, 1000 / 60);
+    }
+  );
+})();
+
+let last = Date.now();
+let tick = 0;
+var loop = function () {
+  let now = Date.now();
+  tick++;
+  if (now - last >= 1000) {
+    console.log('fps: ' + Math.round((tick * 1000) / (now - last)));
+    last = now;
+    tick = 0;
+  }
+
+  rAF(loop);
+};
+
+loop();
 ```
